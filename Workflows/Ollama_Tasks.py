@@ -43,7 +43,6 @@ class OllamaLocal:
                        ... (this Thought/Action/Action Input/Observatiopn can repete N times)
                        Thought: I know the final answer
                        Final Answer: the final answer to the original question
-                       Parse Output: Beautify the output string
                        
                        Begin!
                        
