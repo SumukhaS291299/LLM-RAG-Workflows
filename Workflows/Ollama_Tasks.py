@@ -29,6 +29,8 @@ class OllamaLocal:
         self.llama = Ollama(model=self.model)
 
     # "max_length": 100
+    # You can add you own templates here !!!
+    # OR you CAN PASS custom template here as sysPrompt
     def makeReactAgent(self,
                        sysPrompt="""Answer the following as best you can. You g=have access to the following tools:
                        {tools}
