@@ -11,6 +11,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain.agents import create_react_agent, AgentExecutor
 
 from Workflows import Log
+from Workflows.Loaders.PDF_Loaders import LoadPDF
 
 logger = Log("Ollama_Tasks").log()
 
@@ -29,7 +30,23 @@ class OllamaLocal:
 
     # "max_length": 100
     def makeReactAgent(self,
-                       sysPrompt="Answer the following {question}, if unsure reply I don't know the answer, optional args {tool_names},{agent_scratchpad},{tools}"):
+                       sysPrompt="""Answer the following as best you can. You g=have access to the following tools:
+                       {tools}
+                       Use the following format:
+                       
+                       Question: the input question you must answer
+                       Thought: you should always think about what to do
+                       Action: The action to take, should be may be one of the [{tool_names}] or you think the answer step by step
+                       Observation: the result of the action
+                       ... (this Thought/Action/Action Input/Observatiopn can repete N times)
+                       Thought: I know the final answer
+                       Final Answer: the final answer to the original question
+                       
+                       Begin!
+                       
+                       Question: {input}
+                       Thought: {agent_scratchpad}
+                       """):
         prompt = PromptTemplate.from_template(template=sysPrompt)
         self.MakeOllamaPipline()
         ReactAgent = create_react_agent(llm=self.llama, prompt=prompt, tools=[])
@@ -43,7 +60,7 @@ class OllamaLocal:
         # documents = loader.load()
         # text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         # texts = text_splitter.split_documents(documents)
-        # raise NotImplemented
+        raise NotImplemented
         name = filedialog.askdirectory(title="Load your embeddings")
         embeddings = txtai.Embeddings(path="sentence-transformers/nli-mpnet-base-v2")
         db = embeddings.load(name)
@@ -55,6 +72,10 @@ class OllamaLocal:
         )
         ReactAgent = self.makeReactAgent()
         AgentExecutor(agent=ReactAgent, tools=[tool], verbose=True, handle_parsing_errors=True)
+
+    def RAGAgentChatExecuter(self):
+        ReactAgent = self.makeReactAgent()
+        AgentExecutor(agent=ReactAgent, tools=[], verbose=True, handle_parsing_errors=True)
 
     def promptInputParser(self, sysPrompt):
         """
@@ -68,6 +89,11 @@ class OllamaLocal:
           """
         Match = re.compile(r"{(\w*)}")
         return Match.findall(string=sysPrompt)
+
+    def RAGQA_Chat(self, Query):
+        result = LoadPDF().SearchEmbeddings(Query=Query)
+        print(result)
+        self.Chat(sysPrompt=result + "\n{Question}:")
 
     def Chat(self, sysPrompt: str, model="llama2"):
         """

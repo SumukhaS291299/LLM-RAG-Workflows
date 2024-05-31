@@ -6,7 +6,9 @@ from Workflows.Tasks import Task
 
 from Workflows.Ollama_Tasks import OllamaLocal
 
-# RAE = OllamaLocal().makeReactAgent()
-# print(RAE.invoke({"question": "Write a simple sentence with whe word Blue"}))
+RAE = OllamaLocal(model="gemma:2b").makeReactAgent()
+# print(RAE.invoke({"input": "Write a simple sentence with whe word Blue"}))
+print(RAE.invoke({"input": "Make a song on dad"}))
 
-Chat = OllamaLocal().Chat("Answer the following questions {QUESTIONS} based on {CONTEXT}")
+# Chat = OllamaLocal().Chat("Given {CONTEXT} Answer the following questions {QUESTIONS}")
+# Chat = OllamaLocal().RAGQA_Chat(Query="Best traffic control system")
